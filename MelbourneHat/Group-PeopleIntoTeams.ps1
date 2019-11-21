@@ -160,9 +160,9 @@ foreach ($person in $people) {
 $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, @{N="TeamScoreBest7";E={($_.group | sort score_total -Descending | select -first 7 | measure -sum score_total).sum}} | ft -auto
 
 $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, 
-@{N="TeamScoreBest7";E={($_.group | sort score_total -Descending | select -first 7 | measure -sum score_total).sum}},
-@{N="TeamScoreBest7With4Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum}},
-@{N="TeamScoreBest7With3Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum}} | ft -auto
+@{N="TeamScoreBest6";E={($_.group | sort score_total -Descending | select -first 6 | measure -sum score_total).sum}},
+@{N="TeamScoreBest6With3Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum}},
+@{N="TeamScoreBest6With2Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 2 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum}} | ft -auto
 
 # export to csv
 $dateTime = Get-Date -format "ddMMyyyy HHmmss"
