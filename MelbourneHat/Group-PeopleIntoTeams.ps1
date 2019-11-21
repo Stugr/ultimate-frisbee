@@ -72,11 +72,6 @@ $weighting = @{
     };
 }
 
-#$filter = @(
-#    "gender -eq 'female'",
-#    "gender -eq 'male'"
-#)
-
 $sortOrder = @(
     @{
         expression = 'gender';
@@ -125,9 +120,12 @@ $people | select $select | ft -auto
 #$people | select $select | sort score_total -desc | ft -auto
 
 # team size
-$teamSize = 12
+$teamSize = 10
 $teamNumber = $([math]::Floor($people.Count / $teamSize))
+$femaleNumber = ($people | ? { $_.gender -eq 'female'} ).Count
+"There are $($people.Count) people - $femaleNumber females and $($people.count - $femaleNumber) males"
 "With $($people.Count) people and team sizes of $teamSize there will be $teamNumber teams and $($people.Count % $teamSize) person left over"
+"Teams will have $([math]::Round($femaleNumber / $teamNumber, 2)) females each"
 
 # score total and avg
 $peopleScoreTotal = ($people.score_total | measure -Sum).sum
@@ -157,11 +155,14 @@ foreach ($person in $people) {
     $person.Team = $teamAssignment
 }
 
+
 # get team totals
-1..$teamNumber | % {
-    $i = $_
-    $people | ? { $_.team -eq $i } | measure -Sum score_total | select @{N="Team";E={$i}}, sum
-}
+$people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, @{N="TeamScoreBest7";E={($_.group | sort score_total -Descending | select -first 7 | measure -sum score_total).sum}} | ft -auto
+
+$people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, 
+@{N="TeamScoreBest7";E={($_.group | sort score_total -Descending | select -first 7 | measure -sum score_total).sum}},
+@{N="TeamScoreBest7With4Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum}},
+@{N="TeamScoreBest7With3Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum}} | ft -auto
 
 # export to csv
 $dateTime = Get-Date -format "ddMMyyyy HHmmss"
