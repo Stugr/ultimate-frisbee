@@ -18,12 +18,14 @@ $people | % { $_.knowledge = $_."knowledge_+_experience" }
 # remove old knowledge property
 $people = $people | select -Property * -ExcludeProperty "knowledge_+_experience"
 
+# weighting will use whatever smart single and double quotes that are in the source csv to allow for copying and pasting into the structure below
+# leading and trailing spaces are trimmed when comparing
 $weighting = @{
     'fitness' = @{
         'multiplier' = 1;
         'translation' = @{
             '1 - Melbourne hat is going to kick my ass' = 1;
-            "2 - I知 average normal person fit " = 2; # ugh trailing space
+            "2 - I知 average normal person fit" = 2;
             "3 - I知 average frisbee player fit" = 3;
             "4 - I知 very fit" = 4;
             "5 - I知 a total gun and will run all damn day as if powered by other people痴 suffering" = 5;
@@ -88,7 +90,7 @@ $sortOrder = @(
 
 # count of groupings with scores (not using multiplier yet)
 foreach ($w in $weighting.GetEnumerator()) {
-    $people.($w.Name) | group | select @{N='Weighting';E={$w.Name}}, count, name, @{N='Score';E={$weighting.($w.name).translation.($_.name)}}
+    $people.($w.Name) | group | select @{N='Weighting';E={$w.Name}}, count, name, @{N='Score';E={$weighting.($w.name).translation.($_.name.trim())}}
 }
 
 # loop through people and turn their values into scores (not using multiplier yet)
@@ -96,7 +98,7 @@ foreach ($p in $people) {
     $p | Add-Member "score_total" -membertype noteproperty -Value 0
     foreach ($w in $weighting.GetEnumerator()) {
         $scoreName = "score_$($w.Name)"
-        $scoreBeforeMultiplier = $weighting.($w.name).translation.($p.($w.name))
+        $scoreBeforeMultiplier = $weighting.($w.name).translation.($p.($w.name).trim())
         $p | Add-Member $scoreName -membertype noteproperty -Value ($scoreBeforeMultiplier * $weighting.($w.name).multiplier)
         $p.score_total += $p.$scoreName
     }
