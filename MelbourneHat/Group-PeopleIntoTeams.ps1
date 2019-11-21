@@ -48,7 +48,7 @@ $weighting = @{
         };
     };
     'Knowledge' = @{
-        'multiplier' = .8;
+        'multiplier' = .5;
         'translation' = @{
             'Beginner' = 1;
             "I’ve played some leagues etc but I still get confused by the pick rule" = 2;
@@ -136,10 +136,6 @@ $peopleScoreAverage = [math]::Round($peopleScoreTotal / $people.Count, 2)
 # add team property
 $people | Add-Member "Team" -membertype noteproperty -Value ""
 
-
-$people = ($people | sort score_total -Descending)
-
-#ignoring gender
 $i = 1
 $reverseDirection = $true
 $teamAssignment = 0
