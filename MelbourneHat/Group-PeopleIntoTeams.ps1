@@ -68,6 +68,22 @@ $weighting = @{
     };
 }
 
+#$filter = @(
+#    "gender -eq 'female'",
+#    "gender -eq 'male'"
+#)
+
+$sortOrder = @(
+    @{
+        expression = 'gender';
+        descending = $false;
+    },
+    @{
+        expression = 'score_total';
+        descending = $true;
+    }
+)
+
 # count of groupings with scores (not using multiplier yet)
 foreach ($w in $weighting.GetEnumerator()) {
     $people.($w.Name) | group | select @{N='Weighting';E={$w.Name}}, count, name, @{N='Score';E={$weighting.($w.name).translation.($_.name)}}
@@ -98,8 +114,11 @@ foreach ($w in $weighting.GetEnumerator()) {
     $select += "score_$($w.Name)"
 }
 
+$people = ($people | sort $sortOrder)
+
 # select everyone and their scores
-$people | select $select | sort score_total -desc | ft -auto
+$people | select $select | ft -auto
+#$people | select $select | sort score_total -desc | ft -auto
 
 # team size
 $teamSize = 12
@@ -153,5 +172,10 @@ $teamAssignment = 0
 
 # export to csv
 $dateTime = Get-Date -format "ddMMyyyy HHmmss"
-$people | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
+#$people | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
 
+$people | select first_name, last_name, gender, height, score_total, team, fitness, score_fitness, throwing_ability, score_throwing_ability, level_of_play, score_level_of_play, knowledge, score_knowledge, experience, score_experience | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
+
+# add players to each team
+# reorder teams based on score
+# add players and keep reordering
