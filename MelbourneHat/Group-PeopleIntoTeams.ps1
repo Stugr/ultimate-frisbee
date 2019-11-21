@@ -58,19 +58,12 @@ $weighting = @{
         };
     };
     'Experience' = @{
-        'multiplier' = 1;
+        'multiplier' = 1.2;
         'translation' = @{
             'Beginner' = 1;
-            'Intermediate' = 2;
+            'Intermediate' = 3;
             'Experienced' = 4;
             'Guru' = 5;
-        };
-    };
-    'gender' = @{
-        'multiplier' = 1;
-        'translation' = @{
-            'male' = 0;
-            'female' = 0;
         };
     };
 }
