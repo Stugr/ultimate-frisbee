@@ -140,28 +140,21 @@ $peopleScoreAverage = [math]::Round($peopleScoreTotal / $people.Count, 2)
 # add team property
 $people | Add-Member "Team" -membertype noteproperty -Value ""
 
-$i = 1
-$reverseDirection = $true
-$teamAssignment = 0
-0..($people.count-1) | % {
-    $i = $_
-    if ($i % $teamNumber -eq 0) {
-        # flip direction
-        $reverseDirection = -not $reverseDirection
-        if ($i % ($teamNumber * 2) -eq 0) {
-            $teamAssignment = 0
-        } else {
-            $teamAssignment = $teamNumber + 1
-        }
+$i = 0
+# loop through people
+foreach ($person in $people) {
+    # put one person into each team to start with
+    if ($i -lt $teamNumber) {
+        $i++
+        $teamAssignment = $i
     }
-    # assign team
-    if ($reverseDirection) {
-        $teamAssignment -= 1
-    } else {
-        $teamAssignment += 1
+    # once all teams have a person in them
+    else {
+        # get smallest team with lowest score
+        $teamAssignment = ($people | ? { $_.team -ne "" } | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}} | sort count, teamscore | select -first 1).teamnumber
     }
 
-    $people[$i].Team = $teamAssignment
+    $person.Team = $teamAssignment
 }
 
 # get team totals
