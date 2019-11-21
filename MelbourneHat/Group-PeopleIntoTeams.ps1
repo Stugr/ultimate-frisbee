@@ -1,5 +1,8 @@
 $people = Import-Csv $PSScriptRoot\Melbourne-Hat-2019_2019-11-02-12_01.csv
 
+# set team size
+$teamSize = 10
+
 # how many people in the csv
 "There are $($people.count) in the csv"
 
@@ -9,14 +12,9 @@ $people = $people | ? { $_.fitness }
 # how many have completed signup
 "There are $($people.count) who have completed signup"
 
-# remove the text from fitness just keeping the digit at the start
-#$people | % { $_.fitness = ($_.fitness) -replace '^(\d+).*', '$1' }
-
 # add knowledge to make it shorter
 $people | Add-Member "Knowledge" -membertype noteproperty -Value ""
 $people | % { $_.knowledge = $_."knowledge_+_experience" }
-# remove old knowledge property
-$people = $people | select -Property * -ExcludeProperty "knowledge_+_experience"
 
 # weighting will use whatever smart single and double quotes that are in the source csv to allow for copying and pasting into the structure below
 # leading and trailing spaces are trimmed when comparing
@@ -71,8 +69,9 @@ $weighting = [ordered]@{
             'Guru' = 5;
         };
     };
+    # if total score is less than 12, then short people will get a lower score - height is useful when you're a beginner
     'Height' = @{
-        'threshold' = '-lt 11.9';
+        'threshold' = '-lt 12';
         'multiplier' = 1;
         'default' = 0;
         'translation' = @{
@@ -82,11 +81,12 @@ $weighting = [ordered]@{
             '170-180cm' = -.2;
             '180-190cm' = 0;
             '>190cm' = 0;
-            '180-190cm,>190cm' = 0; # your form allowed multiselect
+            '180-190cm,>190cm' = 0; # the form wrongly allowed multiselect
         };
     };
 }
 
+# sort order - sort by gender ascending (female, then male), then by score descending
 $sortOrder = @(
     @{
         expression = 'gender';
@@ -98,17 +98,24 @@ $sortOrder = @(
     }
 )
 
-# count of groupings with scores (not using multiplier yet)
+# count of groupings with scores (doesn't use multiplier)
 foreach ($w in $weighting.GetEnumerator()) {
     $people.($w.Name) | group | select @{N='Weighting';E={$w.Name}}, count, name, @{N='Score';E={$weighting.($w.name).translation.($_.name.trim())}}
 }
 
 # loop through people and turn their values into scores
 foreach ($p in $people) {
+    # add property to record total score
     $p | Add-Member "score_total" -membertype noteproperty -Value 0
+
+    # loop through weightings
     foreach ($w in $weighting.GetEnumerator()) {
+        # get the score name
         $scoreName = "score_$($w.Name)"
+
+        # translate the text into it's value (trimmed to removed erroneous spaces)
         $scoreBeforeMultiplier = $weighting.($w.name).translation.($p.($w.name).trim())
+
         # if we have a threshold defined to check total score against
         if ($weighting.($w.name).threshold) {
             # if total score doesn't match threshold then set it to the default
@@ -116,12 +123,16 @@ foreach ($p in $people) {
                 $scoreBeforeMultiplier = $weighting.($w.name).default
             }
         }
+
+        # add property to record the score - now it is multiplied
         $p | Add-Member $scoreName -membertype noteproperty -Value ($scoreBeforeMultiplier * $weighting.($w.name).multiplier)
+
+        # add to total score
         $p.score_total += $p.$scoreName
     }
 }
 
-# min max scores
+# get the highest and lowest possible scores
 $peopleScoreMax = 0
 $peopleScoreMin = 0
 foreach ($w in $weighting.GetEnumerator()) {
@@ -129,35 +140,36 @@ foreach ($w in $weighting.GetEnumerator()) {
     $peopleScoreMin += ($weighting.($w.name).translation.GetEnumerator() | sort value | select -First 1).value * $weighting.($w.name).multiplier
 }
 
+# sort based on our sort order
+$people = ($people | sort $sortOrder)
+
 # build select fields
 $select = @('first_name', 'last_name', 'gender', 'score_total')
 foreach ($w in $weighting.GetEnumerator()) {
     $select += "score_$($w.Name)"
 }
 
-$people = ($people | sort $sortOrder)
-
 # select everyone and their scores
 $people | select $select | ft -auto
-#$people | select $select | sort score_total -desc | ft -auto
 
-# team size
-$teamSize = 10
+# number of teams based on size
 $teamNumber = $([math]::Floor($people.Count / $teamSize))
+
+# number of females
 $femaleNumber = ($people | ? { $_.gender -eq 'female'} ).Count
-"There are $($people.Count) people - $femaleNumber females and $($people.count - $femaleNumber) males"
-"With $($people.Count) people and team sizes of $teamSize there will be $teamNumber teams and $($people.Count % $teamSize) person left over"
-"Teams will have $([math]::Round($femaleNumber / $teamNumber, 2)) females each"
 
 # score total and avg
 $peopleScoreTotal = ($people.score_total | measure -Sum).sum
 $peopleScoreAverage = [math]::Round($peopleScoreTotal / $people.Count, 2)
-"Total score equals $peopleScoreTotal with the average score being $peopleScoreAverage"
 
-# team avg
+# print some stats
+"There are $($people.Count) people - $femaleNumber females and $($people.count - $femaleNumber) males"
+"With $($people.Count) people and team sizes of $teamSize there will be $teamNumber teams and $($people.Count % $teamSize) person left over"
+"Teams will have $([math]::Round($femaleNumber / $teamNumber, 2)) females each"
+"Total score equals $peopleScoreTotal with the average score being $peopleScoreAverage"
 "Each team will be worth an average of $($peopleScoreAverage * $teamSize) points (min score for a person is $peopleScoreMin and max score is $peopleScoreMax)"
 
-# add team property
+# add property to store which team each person is on
 $people | Add-Member "Team" -membertype noteproperty -Value ""
 
 $i = 0
@@ -174,6 +186,7 @@ foreach ($person in $people) {
         $teamAssignment = ($people | ? { $_.team -ne "" } | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}} | sort count, teamscore | select -first 1).teamnumber
     }
 
+    # assign person to team
     $person.Team = $teamAssignment
 }
 
