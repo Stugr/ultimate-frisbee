@@ -198,7 +198,7 @@ $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamSco
 @{N="TeamScoreBest6With2Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 2 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum}} | ft -auto
 
 # export to csv
-$dateTime = Get-Date -format "ddMMyyyy HHmmss"
+$dateTime = Get-Date -format "yyyyMMdd HHmmss"
 #$people | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
 
 $people | select first_name, last_name, gender, score_total, team, fitness, score_fitness, throwing_ability, score_throwing_ability, level_of_play, score_level_of_play, knowledge, score_knowledge, experience, score_experience, height, score_height, shirt_size, "party rsvp", "friday rsvp", "Dietary_Requirements_Context:", Other_dietary_requirements, "club affiliation", Did_you_play, Dietary, offer_billet, need_billet, "Product Melbourne Hat 2019 Individual Registration", "Product Melbourne Hat Disc" | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
