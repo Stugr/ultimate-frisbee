@@ -15,6 +15,8 @@ $people = $people | ? { $_.fitness }
 # add knowledge to make it shorter
 $people | Add-Member "Knowledge" -membertype noteproperty -Value ""
 $people | % { $_.knowledge = $_."knowledge_+_experience" }
+# remove old knowledge property
+$people = $people | select -Property * -ExcludeProperty "knowledge_+_experience"
 
 $weighting = @{
     'fitness' = @{
