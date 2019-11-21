@@ -20,7 +20,8 @@ $people = $people | select -Property * -ExcludeProperty "knowledge_+_experience"
 
 # weighting will use whatever smart single and double quotes that are in the source csv to allow for copying and pasting into the structure below
 # leading and trailing spaces are trimmed when comparing
-$weighting = @{
+# weighting is ordered, so that threshold checks against total score can be done near the end can be done in a single loop
+$weighting = [ordered]@{
     'fitness' = @{
         'multiplier' = 1;
         'translation' = @{
@@ -70,6 +71,20 @@ $weighting = @{
             'Guru' = 5;
         };
     };
+    'Height' = @{
+        'threshold' = '-lt 11.9';
+        'multiplier' = 1;
+        'default' = 0;
+        'translation' = @{
+            '<150cm' = -2;
+            '150-160cm' = -1;
+            '160-170cm' = -.5;
+            '170-180cm' = -.2;
+            '180-190cm' = 0;
+            '>190cm' = 0;
+            '180-190cm,>190cm' = 0; # your form allowed multiselect
+        };
+    };
 }
 
 $sortOrder = @(
@@ -88,12 +103,19 @@ foreach ($w in $weighting.GetEnumerator()) {
     $people.($w.Name) | group | select @{N='Weighting';E={$w.Name}}, count, name, @{N='Score';E={$weighting.($w.name).translation.($_.name.trim())}}
 }
 
-# loop through people and turn their values into scores (not using multiplier yet)
+# loop through people and turn their values into scores
 foreach ($p in $people) {
     $p | Add-Member "score_total" -membertype noteproperty -Value 0
     foreach ($w in $weighting.GetEnumerator()) {
         $scoreName = "score_$($w.Name)"
         $scoreBeforeMultiplier = $weighting.($w.name).translation.($p.($w.name).trim())
+        # if we have a threshold defined to check total score against
+        if ($weighting.($w.name).threshold) {
+            # if total score doesn't match threshold then set it to the default
+            if (-not (Invoke-Expression "$($p.score_total) $($weighting.($w.name).threshold)")) {
+                $scoreBeforeMultiplier = $weighting.($w.name).default
+            }
+        }
         $p | Add-Member $scoreName -membertype noteproperty -Value ($scoreBeforeMultiplier * $weighting.($w.name).multiplier)
         $p.score_total += $p.$scoreName
     }
