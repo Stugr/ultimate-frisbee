@@ -157,8 +157,6 @@ foreach ($person in $people) {
 
 
 # get team totals
-$people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, @{N="TeamScoreBest7";E={($_.group | sort score_total -Descending | select -first 7 | measure -sum score_total).sum}} | ft -auto
-
 $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, 
 @{N="TeamScoreBest6";E={($_.group | sort score_total -Descending | select -first 6 | measure -sum score_total).sum}},
 @{N="TeamScoreBest6With3Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum}},
@@ -169,7 +167,3 @@ $dateTime = Get-Date -format "ddMMyyyy HHmmss"
 #$people | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
 
 $people | select first_name, last_name, gender, height, score_total, team, fitness, score_fitness, throwing_ability, score_throwing_ability, level_of_play, score_level_of_play, knowledge, score_knowledge, experience, score_experience | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
-
-# add players to each team
-# reorder teams based on score
-# add players and keep reordering
