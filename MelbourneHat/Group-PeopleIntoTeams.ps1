@@ -188,4 +188,4 @@ $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamSco
 $dateTime = Get-Date -format "ddMMyyyy HHmmss"
 #$people | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
 
-$people | select first_name, last_name, gender, height, score_total, team, fitness, score_fitness, throwing_ability, score_throwing_ability, level_of_play, score_level_of_play, knowledge, score_knowledge, experience, score_experience | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
+$people | select first_name, last_name, gender, score_total, team, fitness, score_fitness, throwing_ability, score_throwing_ability, level_of_play, score_level_of_play, knowledge, score_knowledge, experience, score_experience, height, score_height, shirt_size, "party rsvp", "friday rsvp", "Dietary_Requirements_Context:", Other_dietary_requirements, "club affiliation", Did_you_play, Dietary, offer_billet, need_billet, "Product Melbourne Hat 2019 Individual Registration", "Product Melbourne Hat Disc" | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
