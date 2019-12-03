@@ -228,4 +228,4 @@ $teamRowHeading = New-Object PsObject
 $people | Get-Member -MemberType Properties | % { $teamRowHeading | Add-Member -MemberType $_.MemberType -Name $_.Name -Value "" } 
 #$people | sort team, last_name, gender| % { if ($_.team -ne $lastTeam) { $teamRowHeading.first_name = "Team $($_.team)"; $teamRowHeading }; $_; $lastTeam = $_.team; } | select team, first_name, last_name, gender
 $people | sort team, last_name, gender| % { if ($_.team -ne $lastTeam) { $teamRowHeading }; $_; $lastTeam = $_.team; } | select team, first_name, last_name, gender | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams-forPrintingOrderedByTeam.csv" -Encoding UTF8
-$people | sort last_name, gender, team | select first_name, last_name, gender, team | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams-forPrintingOrderedBySurname.csv" -Encoding UTF8
+$people | sort last_name, gender, team | select first_name, last_name, gender, team, shirt_size | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams-forPrintingOrderedBySurname.csv" -Encoding UTF8
