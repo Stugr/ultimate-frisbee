@@ -1,7 +1,7 @@
-$people = Import-Csv $PSScriptRoot\Melbourne-Hat-2019_2019-11-02-12_01.csv
+$people = Import-Csv "$PSScriptRoot\Hat Rego 2nd december.csv"
 
 # set team size
-$teamSize = 10
+$teamSize = 13
 
 # how many people in the csv
 "There are $($people.count) in the csv"
