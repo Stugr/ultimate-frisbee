@@ -172,6 +172,27 @@ $peopleScoreAverage = [math]::Round($peopleScoreTotal / $people.Count, 2)
 # add property to store which team each person is on
 $people | Add-Member "Team" -membertype noteproperty -Value ""
 
+# re-order people to make even numbers of females, then males based on teams, then put the spare females and males on the end
+$reorderedPeople = @()
+
+# even numbers of females
+$reorderedPeople = $people | ? { $_.gender -eq "female" } | select -first ($femaleNumber - ($femaleNumber % $teamNumber))
+# even numbers of males
+$reorderedPeople += $people | ? { $_.gender -ne "female" } | select -first (($people.count - $femaleNumber) - (($people.count - $femaleNumber) % $teamNumber))
+
+# leftover females
+if ($femaleNumber % $teamNumber) {
+    $reorderedPeople += $people | ? { $_.gender -eq "female" } | select -last ($femaleNumber % $teamNumber)
+}
+
+#leftover males
+if (($people.count - $femaleNumber) % $teamNumber) {
+    $reorderedPeople += $people | ? { $_.gender -eq "male" } | select -last (($people.count - $femaleNumber) % $teamNumber)
+}
+
+$people = $reorderedPeople
+
+
 $i = 0
 # loop through people
 foreach ($person in $people) {
