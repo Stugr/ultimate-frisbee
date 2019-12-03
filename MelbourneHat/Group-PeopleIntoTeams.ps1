@@ -220,6 +220,12 @@ $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamSco
 
 # export to csv
 $dateTime = Get-Date -format "yyyyMMdd HHmmss"
-#$people | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
-
 $people | select first_name, last_name, gender, score_total, team, fitness, score_fitness, throwing_ability, score_throwing_ability, level_of_play, score_level_of_play, knowledge, score_knowledge, experience, score_experience, height, score_height, shirt_size, "party rsvp", "friday rsvp", "Dietary_Requirements_Context:", Other_dietary_requirements, "club affiliation", Did_you_play, Dietary, offer_billet, need_billet, "Product Melbourne Hat 2019 Individual Registration", "Product Melbourne Hat Disc" | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
+
+$lastTeam = 0
+# create empty object to hold the team row heading
+$teamRowHeading = New-Object PsObject
+$people | Get-Member -MemberType Properties | % { $teamRowHeading | Add-Member -MemberType $_.MemberType -Name $_.Name -Value "" } 
+#$people | sort team, last_name, gender| % { if ($_.team -ne $lastTeam) { $teamRowHeading.first_name = "Team $($_.team)"; $teamRowHeading }; $_; $lastTeam = $_.team; } | select team, first_name, last_name, gender
+$people | sort team, last_name, gender| % { if ($_.team -ne $lastTeam) { $teamRowHeading }; $_; $lastTeam = $_.team; } | select team, first_name, last_name, gender | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams-forPrintingOrderedByTeam.csv" -Encoding UTF8
+$people | sort last_name, gender, team | select first_name, last_name, gender, team | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams-forPrintingOrderedBySurname.csv" -Encoding UTF8
