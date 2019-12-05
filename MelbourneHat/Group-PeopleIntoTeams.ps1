@@ -16,6 +16,30 @@ $people = $people | ? { $_.fitness }
 $people | Add-Member "Knowledge" -membertype noteproperty -Value ""
 $people | % { $_.knowledge = $_."knowledge_+_experience" }
 
+# add captains
+$people | Add-Member "Captain" -membertype noteproperty -Value ""
+
+$captains = @(
+    "Ryan Alexander",
+    "James Branson",
+    "Wally Crocker",
+    "Richard Moore",
+    "Lars Erik Gustav Berggren",
+    "Rousheen (Rush) Paisley",
+    "Julian Reynolds",
+    "Rapha�l Buelens",
+    "Martin O'Brien",
+    "Samara Nothard"
+)
+
+foreach ($c in $captains) {
+    ($people | ? { $_.first_name -eq $c.Substring(0, $c.LastIndexOf(" ")) -and $_.last_name -eq $c.Substring($c.LastIndexOf(" ") + 1) }).captain = "yes"
+}
+
+# fix bad gender data
+($people | ? { $_.first_name -eq "Mimi" -and $_.last_name -eq "Suwan" }).gender = "female"
+
+
 # weighting will use whatever smart single and double quotes that are in the source csv to allow for copying and pasting into the structure below
 # leading and trailing spaces are trimmed when comparing
 # weighting is ordered, so that threshold checks against total score can be done near the end can be done in a single loop
