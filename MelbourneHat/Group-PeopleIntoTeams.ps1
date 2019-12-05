@@ -129,7 +129,7 @@ $sortOrder = @(
 
 # count of groupings with scores (doesn't use multiplier)
 foreach ($w in $weighting.GetEnumerator()) {
-    $people.($w.Name) | group | select @{N='Weighting';E={$w.Name}}, count, name, @{N='Score';E={$weighting.($w.name).translation.($_.name.trim())}}
+    $people.($w.Name) | group | select @{N='Weighting';E={$w.Name}}, count, name, @{N='Score';E={$weighting.($w.name).translation.($_.name.trim())}} | sort weighting, score
 }
 
 # loop through people and turn their values into scores
