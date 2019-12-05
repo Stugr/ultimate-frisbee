@@ -7,7 +7,7 @@ $teamSize = 12
 "There are $($people.count) in the csv"
 
 # remove people who haven't completed signup
-$people = $people | ? { $_.fitness }
+$people = $people | ? { $_.status -eq "accepted" }
 
 # how many have completed signup
 "There are $($people.count) who have completed signup"
