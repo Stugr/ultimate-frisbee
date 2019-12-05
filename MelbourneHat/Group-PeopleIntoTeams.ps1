@@ -27,7 +27,7 @@ $captains = @(
     "Lars Erik Gustav Berggren",
     "Rousheen (Rush) Paisley",
     "Julian Reynolds",
-    "Raphaï¿½l Buelens",
+    "Raphaël Buelens",
     "Martin O'Brien",
     "Samara Nothard"
 )
