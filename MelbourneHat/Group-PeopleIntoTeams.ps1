@@ -247,6 +247,7 @@ foreach ($person in $people) {
     $person.Team = [int]$teamAssignment
 }
 
+$dateTime = Get-Date -format "yyyyMMdd HHmmss"
 
 # get team totals
 $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, 
@@ -254,8 +255,12 @@ $people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamSco
 @{N="TeamScoreBest6With3Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum}},
 @{N="TeamScoreBest6With2Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 2 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum}} | ft -auto
 
+$people | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="Females";E={(($_.group | ? { $_.gender -eq 'female'}).count)}}, 
+@{N="TeamScoreBest6";E={($_.group | sort score_total -Descending | select -first 6 | measure -sum score_total).sum}},
+@{N="TeamScoreBest6With3Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 3 | measure -sum score_total).sum}},
+@{N="TeamScoreBest6With2Women";E={($_.group | ? { $_.gender -eq 'female'} | sort score_total -Descending | select -first 2 | measure -sum score_total).sum + ($_.group | ? { $_.gender -ne 'female'} | sort score_total -Descending | select -first 4 | measure -sum score_total).sum}} | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teamsSummary.csv" -Encoding UTF8
+
 # export to csv
-$dateTime = Get-Date -format "yyyyMMdd HHmmss"
 $people | select first_name, last_name, gender, score_total, team, captain, fitness, score_fitness, throwing_ability, score_throwing_ability, level_of_play, score_level_of_play, knowledge, score_knowledge, experience, score_experience, height, score_height, shirt_size, "party rsvp", "friday rsvp", "Dietary_Requirements_Context:", Other_dietary_requirements, "club affiliation", Did_you_play, Dietary, offer_billet, need_billet, "Product Melbourne Hat 2019 Individual Registration", "Product Melbourne Hat Disc" | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams.csv" -Encoding UTF8
 
 $lastTeam = 0
@@ -286,3 +291,5 @@ $sortOrderForCsv = @(
 )
 
 $people | sort $sortOrderForCsv | % { if ($_.team -ne $lastTeam) { $teamRowHeading }; $_; $lastTeam = $_.team; } | select team, first_name, last_name, gender, captain | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams-forPrintingOrderedByTeam.csv" -Encoding UTF8
+
+$people | sort $sortOrderForCsv | % { if ($_.team -ne $lastTeam) { $teamRowHeading }; $_; $lastTeam = $_.team; } | select team, first_name, last_name, gender, captain, score_total | Export-Csv -NoTypeInformation "$PSScriptRoot\$dateTime-teams-WithScoresForPrintingOrderedByTeam.csv" -Encoding UTF8
