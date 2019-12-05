@@ -208,7 +208,7 @@ foreach ($person in $people) {
     }
 
     # assign person to team
-    $person.Team = $teamAssignment
+    $person.Team = [int]$teamAssignment
 }
 
 
