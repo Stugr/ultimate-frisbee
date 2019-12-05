@@ -1,7 +1,7 @@
 $people = Import-Csv "$PSScriptRoot\Hat Rego 2nd december.csv"
 
 # set team size
-$teamSize = 13
+$teamSize = 12
 
 # how many people in the csv
 "There are $($people.count) in the csv"
