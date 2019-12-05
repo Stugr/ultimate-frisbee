@@ -228,7 +228,14 @@ foreach ($person in $people) {
     # once all teams have a person in them
     else {
         # get smallest team with lowest score
-        $teamAssignment = ($people | ? { $_.team -ne "" } | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}} | sort count, teamscore | select -first 1).teamnumber
+        $possibleTeams = $people | ? { $_.team -ne "" } | group team | select @{N="TeamNumber";E={$_.name}}, Count, @{N="TeamScore";E={($_.group | measure -sum score_total).sum}}, @{N="HasCaptain";E={ if ($_.group | ? { $_.captain -eq "yes" }) { $true } else { $false }}} | sort count, teamscore
+        
+        # if person is a captain, put them on a team that hasn't got one yet
+        if ($person.captain -eq "yes") {
+            $teamAssignment = ($possibleTeams | ? { -not $_.hascaptain } | select -first 1).teamnumber
+        } else {
+            $teamAssignment = ($possibleTeams | select -first 1).teamnumber
+        }
     }
 
     # assign person to team
