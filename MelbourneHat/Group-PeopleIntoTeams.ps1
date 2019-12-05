@@ -1,4 +1,4 @@
-$people = Import-Csv "$PSScriptRoot\Hat Rego 2nd december.csv"
+$people = Import-Csv "$PSScriptRoot\Melbourne-Hat-2019_2019-12-06-00_14.csv"
 
 # set team size
 $teamSize = 12
@@ -7,6 +7,7 @@ if (-not $people) {
     Write-Error "CSV import must have failed"
     return
 }
+
 # how many people in the csv
 "There are $($people.count) in the csv"
 
