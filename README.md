@@ -18,9 +18,9 @@ Sorting
 
 4. Using this new ordered list of people, loop through it one by one assigning a person to each team until all teams have a single person on them
 5. Once all teams have one person, loop through the remaining people, each time doing:
-  - Sort teams size asc (smallest team first), then current total score asc (lowest score)
-  - If the next person is a captain, add them to the next smallest/worst team that hasn't got a captain yet
-  - If not then add them to the team at the top of the list (smallest/worst)
+    - Sort teams size asc (smallest team first), then current total score asc (lowest score)
+    - If the next person is a captain, add them to the next smallest/worst team that hasn't got a captain yet
+    - If not then add them to the team at the top of the list (smallest/worst)
 
 File output
 -----------
