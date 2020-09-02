@@ -14,20 +14,20 @@ Sorting
 -------
 1. People are sorted by score descending
 2. Based on team size, the number of teams is set (`total people / chosen team size`)
-3. Re-order people to make even numbers of females, then males (based on number of teams), then put the spare females and males on the end
-  eg. if the number of teams was 3, then a people list that looked like this originally `FFFFFFFFFFFMMMMMMMMMMMMM` would become `FFFFFFFFFMMMMMMMMMMMMFMM`
+3. Re-order people to make even numbers of females, then males (based on number of teams), then put the spare females and males on the end _eg. if the number of teams was 3, then a people list that looked like this originally `FFFFFFFFFFFMMMMMMMMMMMMM` would become `FFFFFFFFFMMMMMMMMMMMMFMM`_
+
 4. Using this new ordered list of people, loop through it one by one assigning a person to each team until all teams have a single person on them
 5. Once all teams have one person, loop through the remaining people, each time doing:
-  5. Sort teams size asc (smallest team first), then current total score asc (lowest score)
-  5. If the next person is a captain, add them to the next smallest/worst team that hasn't got a captain yet
-  5. If not then add them to the team at the top of the list (smallest/worst)
+  - Sort teams size asc (smallest team first), then current total score asc (lowest score)
+  - If the next person is a captain, add them to the next smallest/worst team that hasn't got a captain yet
+  - If not then add them to the team at the top of the list (smallest/worst)
 
 File output
 -----------
 
 Print these 2 files so that people can find what team they are on by looking up their name, but also easily see who else is on their team
 
-`teams-forPrintingOrderedBySurname.csv`
+`teams-forPrintingOrderedBySurname.csv`  
 `teams-forPrintingOrderedByTeam.csv`
 
 A copy of the teams with scores included in case tournament directors need to do any last minute swapping (makes it easier to find someone of a similar score to swap with)
