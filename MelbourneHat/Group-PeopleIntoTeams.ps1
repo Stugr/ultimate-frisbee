@@ -193,7 +193,7 @@ $peopleScoreAverage = [math]::Round($peopleScoreTotal / $people.Count, 2)
 
 # print some stats
 "There are $($people.Count) people - $femaleNumber females and $($people.count - $femaleNumber) males"
-"With $($people.Count) people and team sizes of $teamSize there will be $teamNumber teams and $($people.Count % $teamSize) person left over"
+"With $($people.Count) people and team sizes of $teamSize there will be $teamNumber teams and $($people.Count % $teamSize) people/person left over"
 "Teams will have $([math]::Round($femaleNumber / $teamNumber, 2)) females each"
 "Total score equals $peopleScoreTotal with the average score being $peopleScoreAverage"
 "Each team will be worth an average of $($peopleScoreAverage * $teamSize) points (min score for a person is $peopleScoreMin and max score is $peopleScoreMax)"
