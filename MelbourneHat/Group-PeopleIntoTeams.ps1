@@ -1,4 +1,4 @@
-$people = Import-Csv "$PSScriptRoot\Melbourne-Hat-2019_2019-12-06-00_14.csv"
+$people = Import-Csv "$PSScriptRoot\Answers.csv"
 
 # set team size
 $teamSize = 12
@@ -25,16 +25,16 @@ $people | % { $_.knowledge = $_."knowledge_+_experience" }
 $people | Add-Member "Captain" -membertype noteproperty -Value ""
 
 $captains = @(
-    "Ryan Alexander",
-    "James Branson",
-    "Wally Crocker",
-    "Richard Moore",
-    "Lars Erik Gustav Berggren",
-    "Rousheen (Rush) Paisley",
-    "Julian Reynolds",
-    "Raphaël Buelens",
-    "Martin O'Brien",
-    "Samara Nothard"
+    "Melli Beales",
+    "Brewster Paireman",
+    "Consolata Zammitt",
+    "Cirstoforo Sirr",
+    "Vikki Van Pedder",
+    "Frasquito (Fras) Lascy",
+    "Pauly Marson",
+    "Gënnifer Demko",
+    "Josey O'Eastgate",
+    "Shela Hegel"
 )
 
 foreach ($c in $captains) {
@@ -42,7 +42,7 @@ foreach ($c in $captains) {
 }
 
 # fix bad gender data
-($people | ? { $_.first_name -eq "Mimi" -and $_.last_name -eq "Suwan" }).gender = "female"
+($people | ? { $_.first_name -eq "Moss" -and $_.last_name -eq "Diggell" }).gender = "female"
 
 
 # weighting will use whatever smart single and double quotes that are in the source csv to allow for copying and pasting into the structure below
